@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Python Basics Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--tx:#1b1f2a;--mu:#5b6478;--ac:#4f46e5;--ac2:#eceaff;--ok:#0f9d58;--bad:#d93025;--bd:#e2e5ef;--code:#0f172a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141c;--card:#1b1f2c;--tx:#eef0f7;--mu:#a3abc2;--ac:#8b85ff;--ac2:#2a2d4a;--ok:#4cd08a;--bad:#ff7b72;--bd:#2c3144;--code:#0b1020}}
+:root[data-theme="dark"]{--bg:#12141c;--card:#1b1f2c;--tx:#eef0f7;--mu:#a3abc2;--ac:#8b85ff;--ac2:#2a2d4a;--ok:#4cd08a;--bad:#ff7b72;--bd:#2c3144;--code:#0b1020}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6;font-size:16px}
+main{max-width:820px;margin:0 auto;padding:12px}
+h1{color:var(--ac);font-size:1.7rem;margin:8px 0;letter-spacing:-.02em}
+h2{margin:22px 0 8px;font-size:1.25rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin:12px 0}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;justify-content:space-between;gap:8px;background:var(--ac);color:#fff;border-radius:12px;padding:10px 14px;font-weight:600}
+.bar.low{background:var(--bad)}
+input[type=text]{width:100%;padding:11px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit}
+textarea,pre{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.86rem;line-height:1.55}
+textarea{width:100%;min-height:130px;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--code);color:#e2e8f0;tab-size:4}
+pre{background:var(--code);color:#e2e8f0;border-radius:10px;padding:10px 12px;overflow-x:auto;margin:6px 0;white-space:pre}
+button{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:10px 18px;font:inherit;font-weight:600;cursor:pointer;margin:6px 6px 0 0}
+button.g{background:var(--ac2);color:var(--tx)}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 12px;border:1px solid var(--bd);border-radius:10px;margin:6px 0;cursor:pointer;overflow-wrap:anywhere}
+.opt:has(input:checked){background:var(--ac2);border-color:var(--ac)}
+.opt span{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.9rem}
+.qn{font-weight:700;color:var(--ac)}
+.big{font-size:2.4rem;font-weight:700}
+.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
+.mu{color:var(--mu);font-size:.9rem}
+.io{margin:4px 0}
+.sam{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.sam{grid-template-columns:1fr}}
+.hide{display:none}
+@media print{.bar,button{display:none}}
+</style>
+</head>
+<body>
+<main>
+<div id="start" class="card">
+<h1>Python Basics Test</h1>
+<p>Topics: Basic Python, List and Tuple (no if statements or loops).</p>
+<ul>
+<li><b>Part A:</b> 100 multiple-choice questions, 1 mark each.</li>
+<li><b>Part B:</b> 15 coding problems, 1 mark each. Your code is run automatically against test cases.</li>
+<li><b>Total:</b> 115 marks. Pass mark: 40%.</li>
+<li><b>Time:</b> 1 hour 30 minutes. The test is submitted automatically when time ends.</li>
+</ul>
+<input type="text" id="nm" placeholder="Enter your full name">
+<button onclick="begin()">Start Test</button>
+</div>
+
+<div id="test" class="hide">
+<div class="bar" id="tb"><span>Time left: <span id="tm">01:30:00</span></span><span>Answered: <span id="an">0</span>/100</span></div>
+<h2>Part A: Multiple Choice Questions</h2><div id="mcq"></div>
+<h2>Part B: Coding Problems</h2>
+<div class="card mu">Write a complete Python program for each problem. Read data with <code>input()</code> and display results with <code>print()</code>. Do <b>not</b> print any extra text with <code>print()</code>, because the output must match exactly (text inside <code>input("...")</code> is ignored). Use the Run button to test your code on the sample input.</div>
+<div id="prac"></div>
+<button id="sub" onclick="trySubmit()">Submit Test</button>
+</div>
+
+<div id="res" class="hide"></div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+<script>
+const O=c=>"What is the output of the following code?\n"+c;
+const Q=[
+[`Who created Python?`,`Guido van Rossum|Dennis Ritchie|James Gosling|Bjarne Stroustrup`,0],
+[`Python file extension is:`,`.pt|.py|.pyt|.python`,1],
+[`Python is a ___ language.`,`low-level assembly|high-level interpreted|machine|markup`,1],
+[O(`print("Hello")`),`Hello|"Hello"|hello|Error`,0],
+[`Which is a valid variable name?`,`2name|my-name|my_name|my name`,2],
+[O(`print(type(10))`),`<class 'int'>|<class 'float'>|<class 'str'>|<class 'num'>`,0],
+[`Data type of 3.14 is:`,`int|float|str|double`,1],
+[`Data type of "Hi" is:`,`int|float|str|char`,2],
+[`Data type of True is:`,`int|bool|str|float`,1],
+[O(`print(10 + 5)`),`15|105|"15"|Error`,0],
+[O(`print("10" + "5")`),`15|105|Error|10 5`,1],
+[O(`print(7 / 2)`),`3|3.5|4|3.0`,1],
+[O(`print(7 // 2)`),`3.5|4|3|2`,2],
+[O(`print(7 % 2)`),`3|1|0|3.5`,1],
+[O(`print(2 ** 3)`),`6|8|9|5`,1],
+[O(`print(10 - 2 * 3)`),`24|4|16|6`,1],
+[O(`print((10 - 2) * 3)`),`4|18|24|30`,2],
+[O(`x = 5\nx += 3\nprint(x)`),`5|8|3|53`,1],
+[O(`print(int("25") + 5)`),`30|255|Error|"30"`,0],
+[O(`print(float(3))`),`3|3.0|0.3|Error`,1],
+[O(`print(int(9.99))`),`10|9|9.99|Error`,1],
+[O(`print(str(5) + "5")`),`10|55|Error|5 5`,1],
+[O(`print(len("Python"))`),`5|6|7|Error`,1],
+[O(`print("Hi" * 3)`),`HiHiHi|Hi 3|Hi3|Error`,0],
+[O(`print("abc".upper())`),`abc|ABC|Abc|Error`,1],
+[O(`s = "Python"\nprint(s[0])`),`P|y|n|Python`,0],
+[O(`s = "Python"\nprint(s[-1])`),`P|n|o|Error`,1],
+[O(`s = "Python"\nprint(s[1:4])`),`yth|ytho|Pyt|thon`,0],
+[O(`print(10 > 5)`),`True|False|10|Error`,0],
+[O(`print(5 == 5.0)`),`True|False|Error|None`,0],
+[O(`print(10 != 10)`),`True|False|0|Error`,1],
+[O(`print(True and False)`),`True|False|1|Error`,1],
+[O(`print(not True)`),`True|False|None|Error`,1],
+[O(`print(True or False)`),`True|False|Error|None`,0],
+[`Which function reads user input?`,`get()|input()|scan()|read()`,1],
+[`input() always returns a value of type:`,`int|float|str|list`,2],
+[`Which symbol starts a single-line comment?`,`//|#|/*|--`,1],
+[O(`print("a", "b")`),`ab|a b|a,b|Error`,1],
+[O(`print(type(5 / 1))`),`<class 'int'>|<class 'float'>|<class 'str'>|Error`,1],
+[O(`print(round(3.567, 1))`),`3.5|3.6|3.57|4`,1],
+[`Which brackets are used to create a list?`,`()|[]|{}|<>`,1],
+[O(`a = [1, 2, 3]\nprint(a[0])`),`1|2|3|Error`,0],
+[O(`a = [10, 20, 30]\nprint(a[-1])`),`10|20|30|Error`,2],
+[O(`a = [1, 2, 3]\nprint(len(a))`),`2|3|4|Error`,1],
+[O(`a = [1, 2]\na.append(3)\nprint(a)`),`[1, 2, 3]|[3, 1, 2]|[1, 2]|[1, 2, [3]]`,0],
+[O(`a = [1, 3]\na.insert(1, 2)\nprint(a)`),`[2, 1, 3]|[1, 2, 3]|[1, 3, 2]|Error`,1],
+[O(`a = [1, 2, 3]\na.remove(2)\nprint(a)`),`[1, 3]|[1, 2]|[2, 3]|[3]`,0],
+[O(`a = [1, 2, 3]\nprint(a.pop())`),`1|2|3|[1, 2]`,2],
+[O(`a = [1, 2, 3]\na.pop(0)\nprint(a)`),`[2, 3]|[1, 2]|[1, 3]|[3]`,0],
+[O(`a = [3, 1, 2]\na.sort()\nprint(a)`),`[3, 1, 2]|[1, 2, 3]|[3, 2, 1]|None`,1],
+[O(`a = [3, 1, 2]\na.sort(reverse=True)\nprint(a)`),`[1, 2, 3]|[3, 2, 1]|[2, 1, 3]|Error`,1],
+[O(`a = [1, 2, 3]\na.reverse()\nprint(a)`),`[3, 2, 1]|[1, 2, 3]|[2, 1, 3]|None`,0],
+[O(`a = [1, 2, 3, 4, 5]\nprint(a[1:3])`),`[1, 2]|[2, 3]|[2, 3, 4]|[1, 2, 3]`,1],
+[O(`a = [1, 2, 3, 4, 5]\nprint(a[:2])`),`[1, 2]|[1, 2, 3]|[2]|[3, 4, 5]`,0],
+[O(`a = [1, 2, 3, 4, 5]\nprint(a[2:])`),`[1, 2]|[3, 4, 5]|[2, 3, 4, 5]|[3]`,1],
+[O(`a = [1, 2, 3, 4, 5]\nprint(a[::-1])`),`[5, 4, 3, 2, 1]|[1, 2, 3, 4, 5]|[5]|Error`,0],
+[O(`a = [1, 2, 3, 4, 5, 6]\nprint(a[::2])`),`[1, 3, 5]|[2, 4, 6]|[1, 2]|[2, 4]`,0],
+[O(`print([1, 2] + [3])`),`[1, 2, 3]|[1, 2, [3]]|[6]|Error`,0],
+[O(`print([0] * 3)`),`[0, 0, 0]|[3]|[0, 3]|0`,0],
+[O(`print(max([4, 9, 2]))`),`4|9|2|15`,1],
+[O(`print(min([4, 9, 2]))`),`4|9|2|15`,2],
+[O(`print(sum([1, 2, 3]))`),`5|6|123|Error`,1],
+[O(`a = [1, 2, 2, 3]\nprint(a.count(2))`),`1|2|3|4`,1],
+[O(`a = [5, 6, 7]\nprint(a.index(7))`),`1|2|3|7`,1],
+[O(`print(2 in [1, 2, 3])`),`True|False|2|Error`,0],
+[O(`print(5 in [1, 2, 3])`),`True|False|None|Error`,1],
+[O(`a = [1, 2]\na.extend([3, 4])\nprint(a)`),`[1, 2, [3, 4]]|[1, 2, 3, 4]|[3, 4]|Error`,1],
+[O(`a = [1, 2]\na.append([3, 4])\nprint(len(a))`),`2|3|4|Error`,1],
+[O(`a = [1, 2, 3]\na[1] = 9\nprint(a)`),`[9, 2, 3]|[1, 9, 3]|[1, 2, 9]|Error`,1],
+[O(`a = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)`),`[1, 2, 3]|[1, 2, 3, 4]|[4]|Error`,1],
+[O(`a = [1, 2, 3]\nb = a.copy()\nb.append(4)\nprint(a)`),`[1, 2, 3]|[1, 2, 3, 4]|[4]|Error`,0],
+[O(`a = [1, 2, 3]\na.clear()\nprint(a)`),`[1, 2, 3]|[]|None|0`,1],
+[O(`a = [1, 2, 3]\ndel a[0]\nprint(a)`),`[2, 3]|[1, 2]|[1, 3]|[]`,0],
+[O(`print(list("abc"))`),`['abc']|['a', 'b', 'c']|[a, b, c]|Error`,1],
+[O(`a = ["b", "a"]\na.sort()\nprint(a)`),`['b', 'a']|['a', 'b']|None|Error`,1],
+[`Which brackets are used to create a tuple?`,`[]|()|{}|<>`,1],
+[`A tuple is:`,`mutable|immutable|a dictionary|a set`,1],
+[O(`t = (1, 2, 3)\nprint(t[1])`),`1|2|3|Error`,1],
+[`What is the result of running the following code?\nt = (1, 2, 3)\nt[0] = 9\nprint(t)`,`(9, 2, 3)|TypeError|(1, 2, 3)|None`,1],
+[O(`t = (1, 2, 3)\nprint(len(t))`),`2|3|4|Error`,1],
+[O(`t = (1, 2, 2, 3)\nprint(t.count(2))`),`1|2|3|4`,1],
+[O(`t = (5, 6, 7)\nprint(t.index(6))`),`0|1|2|6`,1],
+[O(`print(type((5)))`),`<class 'tuple'>|<class 'int'>|<class 'list'>|Error`,1],
+[O(`print(type((5,)))`),`<class 'int'>|<class 'tuple'>|<class 'list'>|Error`,1],
+[O(`t = (1, 2, 3, 4, 5)\nprint(t[1:4])`),`(2, 3, 4)|(1, 2, 3)|(2, 3, 4, 5)|(2, 3)`,0],
+[O(`print((1, 2) + (3,))`),`(1, 2, 3)|(1, 2, (3,))|(4, 6)|Error`,0],
+[O(`print((1, 2) * 2)`),`(1, 2, 1, 2)|(2, 4)|(1, 2, 2)|Error`,0],
+[O(`a, b = (10, 20)\nprint(a)`),`10|20|(10, 20)|Error`,0],
+[O(`a, b = 1, 2\nprint(b)`),`1|2|(1, 2)|Error`,1],
+[O(`t = list((1, 2))\nt.append(3)\nprint(t)`),`(1, 2, 3)|[1, 2, 3]|[1, 2]|Error`,1],
+[O(`print(tuple([1, 2, 3]))`),`[1, 2, 3]|(1, 2, 3)|((1, 2), 3)|Error`,1],
+[O(`print(max((3, 8, 1)))`),`3|8|1|12`,1],
+[O(`print(sum((1, 2, 3)))`),`5|6|123|Error`,1],
+[O(`print(3 in (1, 2, 3))`),`True|False|3|Error`,0],
+[O(`t = (1, 2, 3)\na, b, c = t\nprint(c)`),`1|2|3|Error`,2],
+[`Which should you use for data that must not change?`,`list|tuple|string|int`,1],
+[O(`t = (1, [2, 3])\nt[1].append(4)\nprint(t)`),`(1, [2, 3, 4])|(1, [2, 3])|TypeError|(1, 2, 3, 4)`,0],
+[O(`t = ()\nprint(len(t))`),`0|1|None|Error`,0],
+[O(`print(("a", "b")[0])`),`a|b|('a', 'b')|Error`,0],
+[O(`print(sorted((3, 1, 2)))`),`(1, 2, 3)|[1, 2, 3]|None|(3, 1, 2)`,1]
+];
+
+const P=[{"t": "Greeting", "d": "Read a person's name and print a greeting.", "i": "One line: the name.", "o": "One line: Hello, <name>!", "sol": "name = input()\nprint('Hello, ' + name + '!')", "tests": [["Ravi", "Hello, Ravi!"], ["Sneha", "Hello, Sneha!"], ["Amit", "Hello, Amit!"]]}, {"t": "Sum, Difference and Product", "d": "Read two integers a and b. Print a + b, a - b and a * b on three separate lines.", "i": "Two lines: a, then b.", "o": "Three lines: sum, difference, product.", "sol": "a = int(input())\nb = int(input())\nprint(a + b)\nprint(a - b)\nprint(a * b)", "tests": [["15\n4", "19\n11\n60"], ["10\n25", "35\n-15\n250"], ["7\n7", "14\n0\n49"]]}, {"t": "Division Operators", "d": "Read two integers a and b (b is not 0). Print a / b, a // b, a % b and a ** b on four separate lines.", "i": "Two lines: a, then b.", "o": "Four lines in the order given above.", "sol": "a = int(input())\nb = int(input())\nprint(a / b)\nprint(a // b)\nprint(a % b)\nprint(a ** b)", "tests": [["15\n4", "3.75\n3\n3\n50625"], ["20\n5", "4.0\n4\n0\n3200000"], ["9\n2", "4.5\n4\n1\n81"]]}, {"t": "Rectangle", "d": "Read the length and width of a rectangle (integers). Print its area on the first line and its perimeter on the second line.", "i": "Two lines: length, then width.", "o": "Two lines: area, perimeter.", "sol": "l = int(input())\nw = int(input())\nprint(l * w)\nprint(2 * (l + w))", "tests": [["12\n5", "60\n34"], ["7\n3", "21\n20"], ["20\n10", "200\n60"]]}, {"t": "Celsius to Fahrenheit", "d": "Read a temperature in Celsius (integer). Print the temperature in Fahrenheit using F = C * 9 / 5 + 32.", "i": "One line: Celsius value.", "o": "One line: the Fahrenheit value (a float, e.g. 212.0).", "sol": "c = int(input())\nprint(c * 9 / 5 + 32)", "tests": [["100", "212.0"], ["0", "32.0"], ["20", "68.0"]]}, {"t": "String Basics", "d": "Read a single word. Print its length, its uppercase form, its first character and its last character, each on a new line.", "i": "One line: a word.", "o": "Four lines: length, uppercase, first character, last character.", "sol": "s = input()\nprint(len(s))\nprint(s.upper())\nprint(s[0])\nprint(s[-1])", "tests": [["programming", "11\nPROGRAMMING\np\ng"], ["Python", "6\nPYTHON\nP\nn"], ["level", "5\nLEVEL\nl\nl"]]}, {"t": "String Slicing", "d": "Read a string. On the first line print its first three characters. On the second line print the string reversed. Use slicing.", "i": "One line: a string (at least 3 characters).", "o": "Two lines: first three characters, reversed string.", "sol": "s = input()\nprint(s[:3])\nprint(s[::-1])", "tests": [["Python Programming", "Pyt\ngnimmargorP nohtyP"], ["abcdef", "abc\nfedcba"], ["India", "Ind\naidnI"]]}, {"t": "List Basics", "d": "Read three integers and store them in a list. Print the list, then the largest element, the smallest element and the sum of all elements, each on a new line.", "i": "Three lines: one integer on each line.", "o": "Four lines: the list, max, min, sum.", "sol": "a = int(input())\nb = int(input())\nc = int(input())\nnums = [a, b, c]\nprint(nums)\nprint(max(nums))\nprint(min(nums))\nprint(sum(nums))", "tests": [["5\n2\n9", "[5, 2, 9]\n9\n2\n16"], ["10\n10\n3", "[10, 10, 3]\n10\n3\n23"], ["-4\n8\n1", "[-4, 8, 1]\n8\n-4\n5"]]}, {"t": "List Methods", "d": "Read three integers and store them in a list. Append 100 to the end, insert 0 at index 0, sort the list in ascending order and print the list.", "i": "Three lines: one integer on each line.", "o": "One line: the final list.", "sol": "a = int(input())\nb = int(input())\nc = int(input())\nnums = [a, b, c]\nnums.append(100)\nnums.insert(0, 0)\nnums.sort()\nprint(nums)", "tests": [["5\n2\n9", "[0, 2, 5, 9, 100]"], ["30\n20\n10", "[0, 10, 20, 30, 100]"], ["1\n1\n1", "[0, 1, 1, 1, 100]"]]}, {"t": "List Slicing", "d": "Read four integers into a list called nums. Print three lines: the slice nums[1:3], the reversed list, and every second element starting from the first element.", "i": "Four lines: one integer on each line.", "o": "Three lines, each a list.", "sol": "nums = [int(input()), int(input()), int(input()), int(input())]\nprint(nums[1:3])\nprint(nums[::-1])\nprint(nums[::2])", "tests": [["1\n2\n3\n4", "[2, 3]\n[4, 3, 2, 1]\n[1, 3]"], ["10\n20\n30\n40", "[20, 30]\n[40, 30, 20, 10]\n[10, 30]"], ["7\n5\n3\n1", "[5, 3]\n[1, 3, 5, 7]\n[7, 3]"]]}, {"t": "Tuple Basics", "d": "Read a name, an age (integer) and a city. Create a tuple (name, age, city) and print the tuple.", "i": "Three lines: name, age, city.", "o": "One line: the tuple, for example ('Ravi', 21, 'Pune').", "sol": "name = input()\nage = int(input())\ncity = input()\nt = (name, age, city)\nprint(t)", "tests": [["Ravi\n21\nPune", "('Ravi', 21, 'Pune')"], ["Sneha\n19\nMumbai", "('Sneha', 19, 'Mumbai')"], ["Amit\n25\nNagpur", "('Amit', 25, 'Nagpur')"]]}, {"t": "Tuple Unpacking", "d": "Read a name, an age (integer) and a city. Store them in a tuple, unpack the tuple into three variables and print: <name> is <age> years old and lives in <city>", "i": "Three lines: name, age, city.", "o": "One line, for example: Ravi is 21 years old and lives in Pune", "sol": "t = (input(), int(input()), input())\nname, age, city = t\nprint(name, 'is', age, 'years old and lives in', city)", "tests": [["Ravi\n21\nPune", "Ravi is 21 years old and lives in Pune"], ["Sneha\n19\nMumbai", "Sneha is 19 years old and lives in Mumbai"], ["Amit\n25\nNagpur", "Amit is 25 years old and lives in Nagpur"]]}, {"t": "Tuple Methods", "d": "Read four integers and store them in a tuple t. Print four lines: len(t), the last element of t, how many times the first number appears in t (count), and the index of the second number (index).", "i": "Four lines: one integer on each line.", "o": "Four lines: length, last element, count, index.", "sol": "t = (int(input()), int(input()), int(input()), int(input()))\nprint(len(t))\nprint(t[-1])\nprint(t.count(t[0]))\nprint(t.index(t[1]))", "tests": [["10\n20\n30\n20", "4\n20\n1\n1"], ["5\n5\n7\n5", "4\n5\n3\n0"], ["1\n2\n3\n4", "4\n4\n1\n1"]]}, {"t": "List and Tuple Conversion", "d": "Read three integers and store them in a tuple. Convert it to a list, append 99 to the list and print the list. Then convert the list back to a tuple and print the tuple.", "i": "Three lines: one integer on each line.", "o": "Two lines: the list, then the tuple.", "sol": "t = (int(input()), int(input()), int(input()))\nl = list(t)\nl.append(99)\nprint(l)\nprint(tuple(l))", "tests": [["1\n2\n3", "[1, 2, 3, 99]\n(1, 2, 3, 99)"], ["10\n20\n30", "[10, 20, 30, 99]\n(10, 20, 30, 99)"], ["4\n5\n6", "[4, 5, 6, 99]\n(4, 5, 6, 99)"]]}, {"t": "Swap Two Values", "d": "Read two integers a and b. Swap their values using tuple unpacking (a, b = b, a) and print a on the first line and b on the second line.", "i": "Two lines: a, then b.", "o": "Two lines: a and b after swapping.", "sol": "a = int(input())\nb = int(input())\na, b = b, a\nprint(a)\nprint(b)", "tests": [["3\n8", "8\n3"], ["10\n-2", "-2\n10"], ["0\n9", "9\n0"]]}];
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const K='pybasics_test_en_v2',DUR=90*60*1000;
+let S={name:'',start:0,ans:{},code:{},done:0,pr:null},timer=null,armed=false;
+try{Object.assign(S,JSON.parse(localStorage.getItem(K)||'{}'))}catch(e){}
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function qh(q){var l=q.split("\n");return '<div>'+esc(l[0])+'</div>'+(l.length>1?'<pre>'+esc(l.slice(1).join("\n"))+'</pre>':'')}
+function build(){
+ $('mcq').innerHTML=Q.map(function(q,i){return '<div class="card"><span class="qn">Q'+(i+1)+'.</span> '+qh(q[0])+q[1].split('|').map(function(o,j){return '<label class="opt"><input type="radio" name="q'+i+'" value="'+j+'"'+(S.ans[i]===j?' checked':'')+' onchange="pick('+i+','+j+')"><span>'+esc(o)+'</span></label>'}).join('')+'</div>'}).join('');
+ $('prac').innerHTML=P.map(function(p,i){var s=p.tests[0];return '<div class="card"><div><span class="qn">Problem '+(i+1)+': '+esc(p.t)+'</span> <span class="mu">(1 mark)</span></div><p>'+esc(p.d)+'</p><div class="io"><b>Input format:</b> '+esc(p.i)+'</div><div class="io"><b>Output format:</b> '+esc(p.o)+'</div><div class="sam"><div><b>Sample input</b><pre>'+esc(s[0])+'</pre></div><div><b>Sample output</b><pre>'+esc(s[1])+'</pre></div></div><textarea spellcheck="false" placeholder="# Write your Python code here" oninput="code('+i+',this.value)">'+esc(S.code[i]||'')+'</textarea><button class="g" onclick="runOne('+i+')">Run on sample input</button><div id="ro'+i+'"></div></div>'}).join('');
+}
+function pick(i,j){S.ans[i]=j;save();cnt()}
+function code(i,v){S.code[i]=v;save()}
+function cnt(){$('an').textContent=Object.keys(S.ans).length}
+function begin(){var n=$('nm').value.trim();if(!n){$('nm').focus();return}S.name=n;S.start=Date.now();save();run()}
+function run(){$('start').classList.add('hide');if(S.done){result();return}$('test').classList.remove('hide');build();cnt();tick();timer=setInterval(tick,1000)}
+function tick(){var r=S.start+DUR-Date.now();if(r<=0){submit();return}var h=Math.floor(r/3600000),m=Math.floor(r%3600000/60000),s=Math.floor(r%60000/1000);
+ $('tm').textContent=[h,m,s].map(function(x){return String(x).padStart(2,'0')}).join(':');$('tb').classList.toggle('low',r<600000)}
+function trySubmit(){var left=Q.length-Object.keys(S.ans).length;if(!armed&&left>0){armed=true;$('sub').textContent=left+' MCQs unanswered. Press again to submit';return}submit()}
+function submit(){clearInterval(timer);S.done=1;S.end=Date.now();save();$('test').classList.add('hide');result()}
+/* code runner */
+function rd(x){if(Sk.builtinFiles===undefined||Sk.builtinFiles["files"][x]===undefined)throw "File not found: '"+x+"'";return Sk.builtinFiles["files"][x]}
+function runPy(code,inp){
+ if(typeof Sk==='undefined')return Promise.resolve({out:'',err:'Code runner could not be loaded.',na:1});
+ code=code.replace(/\binput\s*\(\s*(?:"[^"\n]*"|'[^'\n]*')\s*\)/g,"input()");
+ var lines=inp?inp.split("\n"):[],out="";
+ Sk.configure({output:function(t){out+=t},read:rd,inputfun:function(){return lines.length?lines.shift():""},__future__:Sk.python3,execLimit:3000});
+ return Sk.misceval.asyncToPromise(function(){return Sk.importMainWithBody("<stdin>",false,code,true)}).then(function(){return{out:out}},function(e){return{out:out,err:e.toString()}});
+}
+const norm=s=>s.split("\n").map(function(l){return l.replace(/\s+$/,'')}).join("\n").replace(/\n+$/,'');
+function runOne(i){var c=S.code[i]||'',el=$('ro'+i);if(!c.trim()){el.innerHTML='<div class="bad">Write some code first.</div>';return}el.innerHTML='<div class="mu">Running...</div>';
+ runPy(c,P[i].tests[0][0]).then(function(r){var ok=!r.err&&norm(r.out)===norm(P[i].tests[0][1]);el.innerHTML='<div class="mu">Your output:</div><pre>'+esc(r.out||'(no output)')+'</pre>'+(r.err?'<div class="bad">Error: '+esc(r.err)+'</div>':ok?'<div class="ok">Matches the sample output.</div>':'<div class="bad">Does not match the sample output.</div>')})}
+async function grade(){
+ if(typeof Sk==='undefined'){S.pr='na';save();return}
+ var pr={};
+ for(var i=0;i<P.length;i++){var c=S.code[i]||'',res=[];
+  for(var k=0;k<P[i].tests.length;k++){var t=P[i].tests[k];
+   if(!c.trim()){res.push({ok:0,out:'',err:'No code submitted'});continue}
+   var r=await runPy(c,t[0]);res.push({ok:(!r.err&&norm(r.out)===norm(t[1]))?1:0,out:r.out||'',err:r.err||''})}
+  pr[i]=res}
+ S.pr=pr;save()}
+function result(){
+ $('res').classList.remove('hide');
+ if(!S.pr){$('res').innerHTML='<div class="card"><h1>Evaluating your code...</h1><div class="mu">Please wait a few seconds.</div></div>';grade().then(result);return}
+ var sc=0,w=[];Q.forEach(function(q,i){if(S.ans[i]===q[2])sc++;else w.push(i)});
+ var na=S.pr==='na',pm=0;if(!na)P.forEach(function(p,i){if(S.pr[i].every(function(x){return x.ok}))pm++});
+ var tot=sc+pm,max=100+(na?0:15),pass=tot>=Math.ceil(max*.4),pc=Math.round(tot/max*100),used=Math.min(S.end||Date.now(),S.start+DUR)-S.start,att=Object.keys(S.ans).length;
+ var h='<div class="card" style="text-align:center"><h1>Test Result</h1><div>'+esc(S.name)+'</div><div class="big '+(pass?'ok':'bad')+'">'+tot+' / '+max+'</div><div>'+pc+'% &middot; '+(pass?'<span class="ok">PASS</span>':'<span class="bad">FAIL</span>')+'</div>'
+ +'<p>Part A (MCQ): <b>'+sc+' / 100</b> &nbsp;|&nbsp; Part B (Coding): <b>'+(na?'to be checked by teacher':pm+' / 15')+'</b></p>'
+ +'<div class="mu">MCQ: '+sc+' correct, '+(att-sc)+' wrong, '+(Q.length-att)+' unanswered &middot; Time used: '+Math.floor(used/60000)+' min</div><button onclick="window.print()">Print / Save as PDF</button></div>';
+ h+='<h2>Part A: Wrong and Unanswered Questions ('+w.length+')</h2>';
+ if(!w.length)h+='<div class="card ok">All answers are correct!</div>';
+ w.forEach(function(i){var q=Q[i],o=q[1].split('|');h+='<div class="card"><span class="qn">Q'+(i+1)+'.</span> '+qh(q[0])+'<div class="bad">Your answer: '+(S.ans[i]===undefined?'Not answered':'<code>'+esc(o[S.ans[i]])+'</code>')+'</div><div class="ok">Correct answer: <code>'+esc(o[q[2]])+'</code></div></div>'});
+ h+='<h2>Part B: Coding Problems</h2>';
+ P.forEach(function(p,i){var r=na?null:S.pr[i],good=r&&r.every(function(x){return x.ok}),n=r?r.filter(function(x){return x.ok}).length:0,f=r?r.findIndex(function(x){return!x.ok}):-1;
+  h+='<div class="card"><span class="qn">Problem '+(i+1)+': '+esc(p.t)+'</span> '+(na?'':(good?'<span class="ok">&#10003; Correct (1/1)</span>':'<span class="bad">&#10007; '+n+'/'+r.length+' test cases passed (0/1)</span>'))+'<p>'+esc(p.d)+'</p><div class="mu">Your code:</div><pre>'+(S.code[i]&&S.code[i].trim()?esc(S.code[i]):'(not attempted)')+'</pre>';
+  if(f>=0){var t=p.tests[f];h+='<div class="bad">Failed test case</div><div class="mu">Input:</div><pre>'+esc(t[0])+'</pre><div class="mu">Expected output:</div><pre>'+esc(t[1])+'</pre><div class="mu">Your output:</div><pre>'+esc(r[f].out||'(no output)')+'</pre>'+(r[f].err?'<div class="bad">Error: '+esc(r[f].err)+'</div>':'')}
+  h+='<div class="ok">Model solution:</div><pre>'+esc(p.sol)+'</pre></div>'});
+ h+='<button class="g" onclick="try{localStorage.removeItem(\''+K+'\')}catch(e){}location.reload()">Reset (for teacher)</button>';
+ $('res').innerHTML=h;scrollTo(0,0)
+}
+if(S.start)run();
+</script>
+</body>
+</html>
